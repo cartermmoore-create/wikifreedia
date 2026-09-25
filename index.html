@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Wikifreedia — The Free Encyclopedia</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="mobile-header">
+    <button class="icon" id="mobileMenu">☰</button>
+    <a href="#/" class="brand mobile-brand">Wikifreedia</a>
+    <button class="icon" id="mobileSearch">⌕</button>
+  </header>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-lockup">
+      <div class="mark">W</div>
+      <div>
+        <a class="brand" href="#/">Wikifreedia</a>
+        <div class="tagline">the free encyclopedia</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-title">Navigation</div>
+      <a href="#/">Main page</a>
+      <a href="#/random">Random article</a>
+      <a href="#/recent">Recent changes</a>
+      <a href="#/categories">Categories</a>
+      <a href="#/help">Help</a>
+      <div class="nav-title">Create</div>
+      <a href="#/create">Create an article</a>
+      <a href="#/drafts">My drafts</a>
+    </nav>
+    <div class="side-note">
+      <p>Local-first demo: your articles are saved in this browser.</p>
+      <button class="small-btn" id="settingsSide">Settings</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="icon desktop-menu" id="desktopMenu">☰</button>
+      <form class="search" id="searchForm">
+        <input id="searchInput" type="search" placeholder="Search Wikifreedia" aria-label="Search Wikifreedia">
+        <button>Search</button>
+      </form>
+      <button class="text-btn" id="settingsTop">Settings</button>
+    </div>
+
+    <div class="content" id="view"></div>
+    <footer>
+      <div>Wikifreedia — a Wikipedia-inspired personal encyclopedia.</div>
+      <div>Original Wikifreedia branding; article data stays local in this starter build.</div>
+    </footer>
+  </main>
+</div>
+
+<div class="modal hidden" id="modal">
+  <div class="modal-card">
+    <div class="modal-head"><h2>Settings</h2><button class="icon" id="closeModal">×</button></div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
