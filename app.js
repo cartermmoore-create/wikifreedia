@@ -22,7 +22,7 @@ Wikifreedia lets people write articles by hand or use an AI-assisted drafting to
 
 == Markup ==
 Use == Heading == for sections, * item for lists, and [[Article Name]] for internal article links.`,
-    categories:["Wikifreedia","Software"], history:[]
+    categories:["Wikifreedia","Software"], images:[], history:[]
   },
   {
     title:"Example article",
@@ -37,7 +37,7 @@ Use this section to explain the subject's development and notable events.
 
 == See also ==
 * [[Wikifreedia]]`,
-    categories:["Examples"], history:[]
+    categories:["Examples"], images:[], history:[]
   }
 ];
 
@@ -45,6 +45,7 @@ let db = loadDb();
 let prefs = loadPrefs();
 let activeTitle = null;
 let activeTab = "read";
+let draftImagesToLoad = [];
 
 function loadDb(){
   try{
@@ -85,6 +86,20 @@ function wikiHtml(src){
   }
   fp();close(); return out||`<p class="muted">This article has no content yet.</p>`;
 }
+
+function imageHtml(image){
+  if(!image || !image.data) return "";
+  const align = image.align === "left" ? "left" : image.align === "right" ? "right" : "center";
+  const width = Math.max(120, Math.min(1000, Number(image.width) || 320));
+  return `<figure class="article-image ${align}">
+    <img src="${image.data}" alt="${esc(image.alt || image.caption || "")}" style="width:${width}px;max-width:100%">
+    ${image.caption ? `<figcaption>${esc(image.caption)}</figcaption>` : ""}
+  </figure>`;
+}
+function mediaMarkup(a){
+  return (a.images||[]).map(imageHtml).join("");
+}
+
 function randomArticle(){if(db.articles.length){const a=db.articles[Math.floor(Math.random()*db.articles.length)];location.hash="#/article/"+encodeURIComponent(a.title)}}
 function status(id,msg){const e=document.getElementById(id);if(e)e.textContent=msg}
 
@@ -165,7 +180,7 @@ function renderArticle(title){
 
 function readArticle(a){
   const cats=a.categories?.length?a.categories:["Uncategorized"];
-  return `<div class="grid"><article class="body"><p class="lead">${esc(a.summary||"")}</p>${wikiHtml(a.content)}
+  return `<div class="grid"><article class="body"><p class="lead">${esc(a.summary||"")}</p>${wikiHtml(a.content)}${mediaMarkup(a)}
     <h2>Categories</h2><p>${cats.map(x=>`<span class="badge">${esc(x)}</span>`).join("")}</p>
   </article><aside>
     <div class="infobox"><h3>${esc(a.title)}</h3>
@@ -202,6 +217,25 @@ function renderEditor(prefill=""){
         <div class="field"><label>Summary</label><input id="editSummary" placeholder="One or two sentences describing the topic"></div>
         <div class="field"><label>Categories</label><input id="editCategories" placeholder="Games, People, History"></div>
         <div class="field"><label>Article body</label><textarea id="editBody" placeholder="== Overview ==&#10;Write your article here.&#10;&#10;== History ==&#10;More information."></textarea></div>
+
+        <div class="media-box">
+          <h3>Article images</h3>
+          <p class="muted">Upload images directly in your browser. They are saved with this article on this device.</p>
+          <input id="imageUpload" type="file" accept="image/*" multiple>
+          <div class="image-settings">
+            <input id="imageCaption" placeholder="Caption for the new image">
+            <input id="imageAlt" placeholder="Alt text">
+            <select id="imageAlign">
+              <option value="center">Center</option>
+              <option value="right">Right</option>
+              <option value="left">Left</option>
+            </select>
+            <input id="imageWidth" type="number" min="120" max="1000" value="320" placeholder="Width">
+          </div>
+          <div id="imagePreviewList" class="image-preview-list"></div>
+          <div class="status" id="imageStatus"></div>
+        </div>
+
         <div class="actions"><button class="primary" id="publish">Publish article</button><button class="secondary" id="draft">Save draft</button></div>
         <div class="status" id="editorStatus"></div>
       </div>
@@ -238,18 +272,69 @@ Expand this section with notable events and development.
 == See also ==
 * [[Wikifreedia]]`};
 }
+
+async function readImageFile(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error || new Error("Could not read image"));
+    reader.readAsDataURL(file);
+  });
+}
+function renderImagePreview(images){
+  const box = document.getElementById("imagePreviewList");
+  if(!box) return;
+  box.innerHTML = (images||[]).map((im,i)=>`
+    <div class="image-preview-item">
+      <img src="${im.data}" alt="">
+      <div>
+        <strong>${esc(im.caption || "Untitled image")}</strong>
+        <div class="muted">${im.align || "center"} · ${Number(im.width)||320}px</div>
+      </div>
+      <button class="danger" data-remove-image="${i}">Remove</button>
+    </div>
+  `).join("");
+  box.querySelectorAll("[data-remove-image]").forEach(btn=>{
+    btn.onclick=()=>{ images.splice(Number(btn.dataset.removeImage),1); renderImagePreview(images); };
+  });
+}
+
 function bindEditor(){
   const title=document.getElementById("editTitle"),sum=document.getElementById("editSummary"),cats=document.getElementById("editCategories"),body=document.getElementById("editBody");
+  const images=[...draftImagesToLoad];
+  draftImagesToLoad = [];
+  const imageUpload=document.getElementById("imageUpload");
+  renderImagePreview(images);
+  if(imageUpload){
+    imageUpload.onchange=async()=>{
+      try{
+        const files=[...imageUpload.files];
+        const caption=document.getElementById("imageCaption").value.trim();
+        const alt=document.getElementById("imageAlt").value.trim();
+        const align=document.getElementById("imageAlign").value;
+        const width=Number(document.getElementById("imageWidth").value)||320;
+        for(const file of files){
+          if(file.size>2*1024*1024) throw new Error(`${file.name} is larger than 2 MB`);
+          const data=await readImageFile(file);
+          images.push({data,caption:caption||file.name.replace(/\.[^.]+$/,""),alt:alt||file.name,align,width});
+        }
+        renderImagePreview(images);
+        renderImagePreview(images); status("imageStatus",`${files.length} image${files.length===1?"":"s"} added.`);
+        imageUpload.value="";
+      }catch(e){status("imageStatus",e.message)}
+    };
+  }
   document.getElementById("publish").onclick=()=>{
     const t=title.value.trim();if(!t){status("editorStatus","Enter a title.");return}
     let a=articleByTitle(t), fresh=!a;
     if(!a)a={title:t,history:[]};
     a.summary=sum.value.trim();a.categories=cats.value.split(",").map(x=>x.trim()).filter(Boolean);a.content=body.value;
+    a.images=images.slice();
     a.history=a.history||[];a.history.push({at:new Date().toISOString(),content:a.content});
     if(fresh)db.articles.push(a);saveDb();activeTab="read";location.hash="#/article/"+encodeURIComponent(t);
   };
   document.getElementById("draft").onclick=()=>{
-    const d={id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),title:title.value.trim()||"Untitled draft",summary:sum.value.trim(),categories:cats.value.split(",").map(x=>x.trim()).filter(Boolean),content:body.value,updatedAt:new Date().toISOString()};
+    const d={id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),title:title.value.trim()||"Untitled draft",summary:sum.value.trim(),categories:cats.value.split(",").map(x=>x.trim()).filter(Boolean),content:body.value,images:images.slice(),updatedAt:new Date().toISOString()};
     db.drafts=db.drafts.filter(x=>x.title.toLowerCase()!==d.title.toLowerCase());db.drafts.unshift(d);saveDb();status("editorStatus","Draft saved.");
   };
   document.getElementById("generate").onclick=async()=>{
@@ -279,7 +364,8 @@ function renderDrafts(){
 function openDraft(id){
   const d=db.drafts.find(x=>x.id===id);if(!d)return;
   renderEditor(d.title);
-  setTimeout(()=>{document.getElementById("editSummary").value=d.summary||"";document.getElementById("editCategories").value=(d.categories||[]).join(", ");document.getElementById("editBody").value=d.content||""},0);
+  draftImagesToLoad = d.images || [];
+  setTimeout(()=>{document.getElementById("editSummary").value=d.summary||"";document.getElementById("editCategories").value=(d.categories||[]).join(", ");document.getElementById("editBody").value=d.content||""; if(d.images){ const p=document.getElementById("imagePreviewList"); p.innerHTML=d.images.map((im,i)=>`<div class="image-preview-item"><img src="${im.data}" alt=""><div><strong>${esc(im.caption||"Untitled image")}</strong><div class="muted">${im.align||"center"} · ${Number(im.width)||320}px</div></div></div>`).join(""); }},0);
 }
 function renderRecent(){
   const changes=[];db.articles.forEach(a=>(a.history||[]).forEach(h=>changes.push({title:a.title,...h})));changes.sort((a,b)=>b.at.localeCompare(a.at));
