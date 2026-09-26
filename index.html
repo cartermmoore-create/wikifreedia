@@ -2,68 +2,327 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Wikifreedia — The Free Encyclopedia</title>
-  <link rel="stylesheet" href="styles.css">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Wikifreedia — a free, user-created encyclopedia."
+  >
+
+  <title>
+    Wikifreedia — The Free Encyclopedia
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
 </head>
+
 <body>
+
 <div class="app">
+
+  <!-- =========================
+       MOBILE HEADER
+  ========================== -->
+
   <header class="mobile-header">
-    <button class="icon" id="mobileMenu">☰</button>
-    <a href="#/" class="brand mobile-brand">Wikifreedia</a>
-    <button class="icon" id="mobileSearch">⌕</button>
+
+    <button
+      class="icon"
+      id="mobileMenu"
+      type="button"
+      aria-label="Open navigation"
+    >
+      ☰
+    </button>
+
+    <a
+      href="#/"
+      class="brand mobile-brand"
+    >
+      Wikifreedia
+    </a>
+
+    <button
+      class="icon"
+      id="mobileSearch"
+      type="button"
+      aria-label="Search"
+    >
+      ⌕
+    </button>
+
   </header>
 
-  <aside class="sidebar" id="sidebar">
+
+  <!-- =========================
+       SIDEBAR
+  ========================== -->
+
+  <aside
+    class="sidebar"
+    id="sidebar"
+  >
+
     <div class="brand-lockup">
-      <div class="mark">W</div>
-      <div>
-        <a class="brand" href="#/">Wikifreedia</a>
-        <div class="tagline">the free encyclopedia</div>
+
+      <div
+        class="mark"
+        aria-hidden="true"
+      >
+        W
       </div>
+
+      <div>
+
+        <a
+          class="brand"
+          href="#/"
+        >
+          Wikifreedia
+        </a>
+
+        <div class="tagline">
+          the free encyclopedia
+        </div>
+
+      </div>
+
     </div>
-    <nav>
-      <div class="nav-title">Navigation</div>
-      <a href="#/">Main page</a>
-      <a href="#/random">Random article</a>
-      <a href="#/recent">Recent changes</a>
-      <a href="#/categories">Categories</a>
-      <a href="#/help">Help</a>
-      <div class="nav-title">Create</div>
-      <a href="#/create">Create an article</a>
-      <a href="#/drafts">My drafts</a>
+
+
+    <nav aria-label="Wikifreedia navigation">
+
+      <div class="nav-title">
+        Navigation
+      </div>
+
+      <a href="#/">
+        Main page
+      </a>
+
+      <a href="#/random">
+        Random article
+      </a>
+
+      <a href="#/recent">
+        Recent changes
+      </a>
+
+      <a href="#/categories">
+        Categories
+      </a>
+
+      <a href="#/help">
+        Help
+      </a>
+
+
+      <div class="nav-title">
+        Create
+      </div>
+
+      <a href="#/create">
+        Create an article
+      </a>
+
+      <a href="#/drafts">
+        My drafts
+      </a>
+
     </nav>
+
+
     <div class="side-note">
-      <p>Local-first demo: your articles are saved in this browser.</p>
-      <button class="small-btn" id="settingsSide">Settings</button>
+
+      <p>
+        Wikifreedia is a local-first
+        encyclopedia demo.
+      </p>
+
+      <button
+        class="small-btn"
+        id="settingsSide"
+        type="button"
+      >
+        Settings
+      </button>
+
     </div>
+
   </aside>
 
+
+  <!-- =========================
+       MAIN
+  ========================== -->
+
   <main class="main">
+
+    <!-- TOP SEARCH BAR -->
+
     <div class="topbar">
-      <button class="icon desktop-menu" id="desktopMenu">☰</button>
-      <form class="search" id="searchForm">
-        <input id="searchInput" type="search" placeholder="Search Wikifreedia" aria-label="Search Wikifreedia">
-        <button>Search</button>
+
+      <button
+        class="icon desktop-menu"
+        id="desktopMenu"
+        type="button"
+        aria-label="Toggle sidebar"
+      >
+        ☰
+      </button>
+
+
+      <form
+        class="search"
+        id="searchForm"
+        role="search"
+      >
+
+        <input
+          id="searchInput"
+          type="search"
+          autocomplete="off"
+          placeholder="Search Wikifreedia"
+          aria-label="Search Wikifreedia"
+        >
+
+        <button
+          type="submit"
+        >
+          Search
+        </button>
+
       </form>
-      <button class="text-btn" id="settingsTop">Settings</button>
+
+
+      <button
+        class="text-btn"
+        id="settingsTop"
+        type="button"
+      >
+        Settings
+      </button>
+
     </div>
 
-    <div class="content" id="view"></div>
+
+    <!-- =========================
+         PAGE CONTENT
+    ========================== -->
+
+    <div
+      class="content"
+      id="view"
+    >
+
+      <!--
+        The JavaScript app replaces this
+        content when the page loads.
+      -->
+
+      <noscript>
+
+        <div class="box">
+
+          <h1>
+            Wikifreedia
+          </h1>
+
+          <p>
+            JavaScript is required to use
+            Wikifreedia.
+          </p>
+
+        </div>
+
+      </noscript>
+
+    </div>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
     <footer>
-      <div>Wikifreedia — a Wikipedia-inspired personal encyclopedia.</div>
-      <div>Original Wikifreedia branding; article data stays local in this starter build.</div>
+
+      <div>
+        Wikifreedia — the free encyclopedia.
+      </div>
+
+      <div>
+        A Wikipedia-inspired encyclopedia
+        for user-created articles.
+      </div>
+
     </footer>
+
   </main>
+
 </div>
 
-<div class="modal hidden" id="modal">
-  <div class="modal-card">
-    <div class="modal-head"><h2>Settings</h2><button class="icon" id="closeModal">×</button></div>
-    <div id="modalContent"></div>
+
+<!-- =========================
+     SETTINGS MODAL
+========================== -->
+
+<div
+  class="modal hidden"
+  id="modal"
+  aria-hidden="true"
+>
+
+  <div
+    class="modal-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="settingsTitle"
+  >
+
+    <div class="modal-head">
+
+      <h2 id="settingsTitle">
+        Settings
+      </h2>
+
+      <button
+        class="icon"
+        id="closeModal"
+        type="button"
+        aria-label="Close settings"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div
+      id="modalContent"
+      class="modal-content"
+    >
+    </div>
+
   </div>
+
 </div>
 
-<script src="app.js"></script>
+
+<!-- =========================
+     APPLICATION
+========================== -->
+
+<script
+  src="app.js"
+  defer
+></script>
+
 </body>
 </html>
